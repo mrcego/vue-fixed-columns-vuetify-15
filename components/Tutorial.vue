@@ -9,32 +9,6 @@
     item-key="name"
     class="elevation-1"
   >
-    <template #headers="props">
-      <tr>
-        <th>
-          <v-checkbox
-            :input-value="props.all"
-            :indeterminate="props.indeterminate"
-            primary
-            hide-details
-            @click.stop="toggleAll"
-          ></v-checkbox>
-        </th>
-        <th
-          v-for="header in props.headers"
-          :key="header.text"
-          :class="[
-            'column sortable',
-            pagination.descending ? 'desc' : 'asc',
-            header.value === pagination.sortBy ? 'active' : '',
-          ]"
-          @click="changeSort(header.value)"
-        >
-          <v-icon small>arrow_upward</v-icon>
-          {{ header.text }}
-        </th>
-      </tr>
-    </template>
     <template #items="props">
       <tr :active="props.selected" @click="props.selected = !props.selected">
         <td>

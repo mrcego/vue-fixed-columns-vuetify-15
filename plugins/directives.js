@@ -4,21 +4,25 @@ function setElementStyle(
   HTMLElement,
   { left, j: index, fixedColumns: numberFixedColumns }
 ) {
-  const { style } = HTMLElement
-  style.position = 'sticky'
-  style.background = 'white'
-  style.left = left + 'px'
-  style['z-index'] = '1'
+  try {
+    const { style } = HTMLElement
+    style.position = 'sticky'
+    style.background = 'white'
+    style.left = left + 'px'
+    style['z-index'] = '10'
 
-  if (index === numberFixedColumns - 1) {
-    style['border-right'] = '0.2em solid rgba( 0, 0, 0, 0.15 )'
-    style.blur = '6px'
+    if (index === numberFixedColumns - 1) {
+      style['border-right'] = '0.2em solid rgba( 0, 0, 0, 0.15 )'
+      style.blur = '6px'
+    }
+
+    return HTMLElement
+  } catch (err) {
+    throw new Error(err)
   }
-
-  return HTMLElement
 }
 
-Vue.directive('fixed-column', (el, binding, vnode) => {
+Vue.directive('fixed-columns', (el, binding, vnode) => {
   const datatable = vnode?.componentOptions?.tag === 'v-data-table'
 
   if (!datatable)
@@ -39,18 +43,22 @@ Vue.directive('fixed-column', (el, binding, vnode) => {
 
     fixedColumns = fixedColumns + 1
 
-    for (let i = 2; i < rowLength; i++) {
+    // ? $attrs arg is not present in Vuetify 2.x
+    let index = vnode.componentInstance.$vuetify.$attrs ? 2 : 1
+    console.info(`Vuetify ${index === 2 ? index - 1 : index + 1}.x detected!`)
+
+    for (index; index < rowLength; index++) {
       let left = 0
       for (let j = 0; j < fixedColumns; j++) {
         let header = el.getElementsByTagName('th')[j]
-        let cell = row[i].children[j]
+        let cell = row[index].children[j]
 
         const defaultParams = { left, j, fixedColumns }
 
-        header = setElementStyle(header, { ...defaultParams })
+        if (header) header = setElementStyle(header, { ...defaultParams })
         cell = setElementStyle(cell, { ...defaultParams })
 
-        left += header.offsetWidth
+        left += cell.getBoundingClientRect().width
       }
     }
   })
